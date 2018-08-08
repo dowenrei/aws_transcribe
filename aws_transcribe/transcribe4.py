@@ -78,16 +78,19 @@ class Ui_Dialog(object):
     def transcribe(self):
         _translate = QtCore.QCoreApplication.translate
         self.label.setText("in_transcribe")
-        
-        s3.meta.client.upload_file('./output.wav','silencedanger','output.wav')
+        self.aws()
 
+    def aws(self):
+        print("in aws")
+        s3.meta.client.upload_file('./output.wav','silencedanger','output.wav')
+        
         transcribe = boto3.client('transcribe')
         currentDT = datetime.datetime.now()
         date=currentDT.day+currentDT.hour+currentDT.minute+currentDT.second
         job_name =str(date)
         job_uri = "https://s3.amazonaws.com/silencedanger/"+"output.wav"
 
-
+        QtWidgets.QApplication.processEvents()
         transcribe.start_transcription_job(
         TranscriptionJobName=job_name,
         Media={'MediaFileUri': job_uri},
@@ -95,8 +98,9 @@ class Ui_Dialog(object):
         LanguageCode='en-US'
         )
         
-        
+        QtWidgets.QApplication.processEvents()
         while True:
+            QtWidgets.QApplication.processEvents()
             status = transcribe.get_transcription_job(TranscriptionJobName=job_name)
             if status['TranscriptionJob']['TranscriptionJobStatus'] in ['COMPLETED', 'FAILED']:
                 break
@@ -156,7 +160,7 @@ if __name__ == "__main__":
     Dialog = QtWidgets.QDialog()
     ui = Ui_Dialog(Dialog)
     Dialog.show()
-
+    app.exec()
 
 
 
