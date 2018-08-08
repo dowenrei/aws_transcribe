@@ -16,7 +16,7 @@ FORMAT = pyaudio.paInt16
 CHANNELS = 2
 RATE = 44100
 RECORD_SECONDS = 10
-WAVE_OUTPUT_FILENAME = "output.wav"
+WAVE_OUTPUT_FILENAME = "recordoutput.wav"
 
 
 
@@ -78,7 +78,6 @@ def main():
         status = transcribe.get_transcription_job(TranscriptionJobName=job_name)
         if status['TranscriptionJob']['TranscriptionJobStatus'] in ['COMPLETED', 'FAILED']:
             break
-            print("Not ready yet...")
         time.sleep(5)
 
     #print(status["TranscriptionJob"]["Transcript"]["TranscriptFileUri"])

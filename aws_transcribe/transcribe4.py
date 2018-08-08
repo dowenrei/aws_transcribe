@@ -64,6 +64,7 @@ class Ui_Dialog(object):
         self.retranslateUi(Dialog)
         self.pushButton.pressed.connect(self.start)
         self.pushButton_2.pressed.connect(self.stop)
+        self.pushButton_3.pressed.connect(self.transcribe)
 
  
     def retranslateUi(self, Dialog):
@@ -76,13 +77,44 @@ class Ui_Dialog(object):
 
     def transcribe(self):
         _translate = QtCore.QCoreApplication.translate
-        self.label.setText("hi")      
+        self.label.setText("in_transcribe")
+        
+        s3.meta.client.upload_file('./output.wav','silencedanger','output.wav')
+
+        transcribe = boto3.client('transcribe')
+        currentDT = datetime.datetime.now()
+        date=currentDT.day+currentDT.hour+currentDT.minute+currentDT.second
+        job_name =str(date)
+        job_uri = "https://s3.amazonaws.com/silencedanger/"+"output.wav"
+
+
+        transcribe.start_transcription_job(
+        TranscriptionJobName=job_name,
+        Media={'MediaFileUri': job_uri},
+        MediaFormat='wav',
+        LanguageCode='en-US'
+        )
+        
+        
+        while True:
+            status = transcribe.get_transcription_job(TranscriptionJobName=job_name)
+            if status['TranscriptionJob']['TranscriptionJobStatus'] in ['COMPLETED', 'FAILED']:
+                break
+            time.sleep(5)
+
+        #print(status["TranscriptionJob"]["Transcript"]["TranscriptFileUri"])
+        job_result = status['TranscriptionJob']['Transcript']['TranscriptFileUri']
+
+        with urllib.request.urlopen(job_result) as url:
+            text=json.loads(url.read().decode())['results']['transcripts'][0]['transcript']
+        print(text)      
+        self.label.setText(text)
 
     def start(self):
-        global count
+        global count        
         print("start")
+
         count=1
-        print(count)
         while count==1:
             data = stream.read(CHUNK)
             frames.append(data)
@@ -115,34 +147,7 @@ def detect_entities(text, language_code):
 '''
 def main():
 
-    s3.meta.client.upload_file('./output.wav','silencedanger','output.wav')
 
-    transcribe = boto3.client('transcribe')
-    currentDT = datetime.datetime.now()
-    date=currentDT.day+currentDT.hour+currentDT.minute+currentDT.second
-    job_name =str(date)
-    job_uri = "https://s3.amazonaws.com/silencedanger/"+"output.wav"
-
-
-    transcribe.start_transcription_job(
-    TranscriptionJobName=job_name,
-    Media={'MediaFileUri': job_uri},
-    MediaFormat='wav',
-    LanguageCode='en-US'
-)
-
-    while True:
-        status = transcribe.get_transcription_job(TranscriptionJobName=job_name)
-        if status['TranscriptionJob']['TranscriptionJobStatus'] in ['COMPLETED', 'FAILED']:
-            break
-            print("Not ready yet...")
-        time.sleep(5)
-
-    #print(status["TranscriptionJob"]["Transcript"]["TranscriptFileUri"])
-    job_result = status['TranscriptionJob']['Transcript']['TranscriptFileUri']
-    with urllib.request.urlopen(job_result) as url:
-        text=json.loads(url.read().decode())['results']['transcripts'][0]['transcript']
-    print(text)
 '''
 
 if __name__ == "__main__":
@@ -152,11 +157,6 @@ if __name__ == "__main__":
     ui = Ui_Dialog(Dialog)
     Dialog.show()
 
-
-
-    
-    
-    ui.pushButton_3.pressed.connect(ui.transcribe)
 
 
 
