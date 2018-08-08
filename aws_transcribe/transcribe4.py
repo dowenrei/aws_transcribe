@@ -42,7 +42,7 @@ class Ui_Dialog(object):
 
     def __init__(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(822, 483)
+        Dialog.resize(600, 483)
         self.pushButton = QtWidgets.QPushButton(Dialog)
         self.pushButton.setGeometry(QtCore.QRect(10, 250, 93, 28))
         self.pushButton.setObjectName("pushButton")
@@ -72,7 +72,7 @@ class Ui_Dialog(object):
         Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
         self.pushButton.setText(_translate("Dialog", "Start"))
         self.pushButton_2.setText(_translate("Dialog", "Stop"))
-        self.pushButton_3.setText(_translate("Dialog", "Transcribing"))
+        self.pushButton_3.setText(_translate("Dialog", "Transcribe"))
         self.label.setText(_translate("Dialog", "TextLabel"))
 
     def transcribe(self):
