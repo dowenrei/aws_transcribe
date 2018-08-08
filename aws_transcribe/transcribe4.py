@@ -24,6 +24,8 @@ CHANNELS = 2
 RATE = 44100
 RECORD_SECONDS = 10
 WAVE_OUTPUT_FILENAME = "output.wav"
+count=0
+
 
 p = pyaudio.PyAudio()
 
@@ -60,6 +62,8 @@ class Ui_Dialog(object):
         self.label.setFrameShape(QtWidgets.QFrame.Box)
         self.label.setObjectName("label")
         self.retranslateUi(Dialog)
+        self.pushButton.pressed.connect(self.start)
+        self.pushButton_2.pressed.connect(self.stop)
 
  
     def retranslateUi(self, Dialog):
@@ -74,22 +78,31 @@ class Ui_Dialog(object):
         _translate = QtCore.QCoreApplication.translate
         self.label.setText("hi")      
 
-def start():
-    print("start")
-    data = stream.read(CHUNK)
-    frames.append(data)
-    
-def stop():
-    print("stop")
-    stream.stop_stream()
-    stream.close()
-    p.terminate()
-    wf = wave.open(WAVE_OUTPUT_FILENAME, 'wb')
-    wf.setnchannels(CHANNELS)
-    wf.setsampwidth(p.get_sample_size(FORMAT))
-    wf.setframerate(RATE)
-    wf.writeframes(b''.join(frames))
-    wf.close()
+    def start(self):
+        global count
+        print("start")
+        count=1
+        print(count)
+        while count==1:
+            data = stream.read(CHUNK)
+            frames.append(data)
+            QtWidgets.QApplication.processEvents()
+            if count==0:
+                break
+
+    def stop(self):
+        global count
+        count=0
+        print("stop")
+        stream.stop_stream()
+        stream.close()
+        p.terminate()
+        wf = wave.open(WAVE_OUTPUT_FILENAME, 'wb')
+        wf.setnchannels(CHANNELS)
+        wf.setsampwidth(p.get_sample_size(FORMAT))
+        wf.setframerate(RATE)
+        wf.writeframes(b''.join(frames))
+        wf.close()
     
 
 #job_result = job['TranscriptionJob']['Transcript']['TranscriptFileUri']
@@ -138,9 +151,11 @@ if __name__ == "__main__":
     Dialog = QtWidgets.QDialog()
     ui = Ui_Dialog(Dialog)
     Dialog.show()
-    ui.pushButton.pressed.connect(start)
-    ui.pushButton_2.pressed.connect(stop)
 
+
+
+    
+    
     ui.pushButton_3.pressed.connect(ui.transcribe)
 
 
