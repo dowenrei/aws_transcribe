@@ -6,5 +6,5 @@
 **stop** :  Pyadio will output a audio (.wav) file.\
 **transcribe** :  The audio is uploaded to aws s3 bucket and transcribed. The output will be shown in the GUI.
 
-*Further Improvement* 
+#### *Further Improvement* 
 - Real Time Translation
