@@ -1,4 +1,6 @@
 # aws_transcribe
+Use PyQt5 with AWS Transcribe
+
 ![Preview](https://github.com/dowenrei/aws_transcribe/blob/master/aws_transcribe/GUI_Preview.PNG)
 ![Result](https://github.com/dowenrei/aws_transcribe/blob/master/aws_transcribe/GUI_SampleResult.PNG)
 
